@@ -40,7 +40,10 @@ class Usuario {
             $this->setuser_password($row["user_password"]);
         }
     }
-
+    public static function getList(){
+        $sql = new Sql();
+        return  $sql->select("SELECT * FROM phpgen_users ORDER BY user_id; ");
+    }
     public function __toString(){
         return json_encode( array(
             "user_id"=>$this->getUser_id(),
@@ -48,7 +51,31 @@ class Usuario {
             "user_password"=>$this->getUser_password()
         ));
     }
-//SELECT `user_id`, `user_name`, `user_password` FROM `phpgen_users` WHERE 1
+    public static function search($login){
+
+        $sql = new Sql();
+        return  $sql->select("SELECT * FROM phpgen_users WHERE user_name LIKE :SEARCH; ", array(':SEARCH'=>"%".$login."%"));
+    }
+    public function login($login, $password){
+
+        $sql = new Sql();
+        $results = $sql->select("SELECT * FROM phpgen_users WHERE user_name = :LOGIN AND user_password = :PASSWORD", array(
+            ':LOGIN'=>$login,
+            ':PASSWORD'=>$password
+            ));
+        if ( count( $results ) > 0 ) {
+            $row =$results[0];
+
+            $this->setUser_id( $row['user_id']);
+            $this->setUser_name( $row['user_name']);
+            $this->setUser_password( $row['user_password']);
+
+        } else {
+            throw new Exception("Login e/ou Senha inválidos");
+        }
+    }
+
+    //SELECT `user_id`, `user_name`, `user_password` FROM `phpgen_users` WHERE 1
 
 
 //SELECT `user_id`, `user_name`, `user_password` FROM `phpgen_users` WHERE 1
